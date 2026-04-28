@@ -1,0 +1,21 @@
+name: Test WMC Scraping
+
+on:
+  workflow_dispatch:  # lets you run it manually
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Try to fetch WMC
+        run: |
+          curl -s -o response.html -w "HTTP Status: %{http_code}\nIP info follows...\n" \
+            -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+            "https://www.wasatchmountainclub.org/hiking"
+          echo "---"
+          echo "First 500 bytes of response:"
+          head -c 500 response.html
+          echo ""
+          echo "---"
+          echo "Body length: $(wc -c < response.html) bytes"
+          echo "Contains 'Upcoming activities': $(grep -c 'Upcoming activities' response.html || echo 0)"
