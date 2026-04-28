@@ -1,0 +1,22 @@
+name: Test Meetup Scraping
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Try to fetch Meetup event page
+        run: |
+          curl -s -o response.html -w "HTTP Status: %{http_code}\n" \
+            -A "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+            "https://www.meetup.com/wasatchhiking/events/314182440/"
+          echo "---"
+          echo "Body length: $(wc -c < response.html) bytes"
+          echo "Contains 'Sunday, Jul' (date marker): $(grep -c 'Sunday, Jul' response.html || echo 0)"
+          echo "Contains 'Mount Whitney' (title): $(grep -c 'Mount Whitney' response.html || echo 0)"
+          echo "Contains 'application/ld+json' (structured data): $(grep -c 'application/ld+json' response.html || echo 0)"
+          echo "---"
+          echo "First 800 bytes of response:"
+          head -c 800 response.html
